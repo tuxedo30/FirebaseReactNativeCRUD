@@ -1,20 +1,48 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-export default function App() {
+import AddArticuloScreen from './screens/AddArticuloScreen';
+import ArticuloScreen from './screens/ArticuloScreen';
+import ArticuloDetalleScreen from './screens/ArticuloDetalleScreen';
+
+const Stack = createStackNavigator();
+
+function MyStack() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Stack.Navigator
+      screenOptions={{
+          headerStyle: {
+            backgroundColor: '#621FF7',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}>
+      <Stack.Screen 
+        name="AddArticuloScreen" 
+        component={AddArticuloScreen} 
+        options={{ title: 'Agregar Articulo' }}
+      />
+      <Stack.Screen 
+        name="ArticuloScreen" 
+        component={ArticuloScreen} 
+        options={{ title: 'Lista de Articulos' }}
+      />
+      <Stack.Screen 
+       name="ArticuloDetalleScreen" 
+       component={ArticuloDetalleScreen} 
+       options={{ title: 'Detalle de Articulo' }}
+      />
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <MyStack />
+    </NavigationContainer>
+  );
+}
