@@ -21,14 +21,14 @@ function MyStack() {
           },
         }}>
       <Stack.Screen 
-        name="AddArticuloScreen" 
-        component={AddArticuloScreen} 
-        options={{ title: 'Agregar Articulo' }}
-      />
-      <Stack.Screen 
         name="ArticuloScreen" 
         component={ArticuloScreen} 
         options={{ title: 'Lista de Articulos' }}
+      />
+      <Stack.Screen 
+        name="AddArticuloScreen" 
+        component={AddArticuloScreen} 
+        options={{ title: 'Agregar Articulo' }}
       />
       <Stack.Screen 
        name="ArticuloDetalleScreen" 

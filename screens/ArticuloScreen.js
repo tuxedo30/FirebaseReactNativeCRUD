@@ -1,14 +1,16 @@
 
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, ActivityIndicator, View } from 'react-native';
-//import { ListItem } from 'react-native-elements'
-import firebase from '../database/firebaseDb';
+import { Button,StyleSheet, ScrollView, ActivityIndicator, View, Text } from 'react-native';
+import { ListItem, Card } from 'react-native-elements'
+import { collection, doc, setDoc, onSnapshot } from "firebase/firestore";
+import db from "../database/firebaseDb"
+
 
 class ArticuloScreen extends Component {
 
   constructor() {
     super();
-    this.firestoreRef = firebase.firestore().collection('articulo');
+    this.firestoreRef = collection(db,'articulo');
     this.state = {
       isLoading: true,
       articuloArr: []
@@ -16,7 +18,7 @@ class ArticuloScreen extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.firestoreRef.onSnapshot(this.getCollection);
+    this.unsubscribe = onSnapshot(this.firestoreRef, this.getCollection);
   }
 
   componentWillUnmount(){
@@ -27,44 +29,59 @@ class ArticuloScreen extends Component {
     const articuloArr = [];
     querySnapshot.forEach((res) => {
       const { nombre, precio, referencia } = res.data();
-      articuloArr.push({
-        key: res.id,
-        res,
-        nombre,
-        precio,
-        referencia,
-      });
+      articuloArr.push({key: res.id, nombre, precio, referencia});
     });
     this.setState({
       articuloArr,
       isLoading: false,
    });
+
   }
 
   render() {
     if(this.state.isLoading){
       return(
+        
         <View style={styles.preloader}>
+          
           <ActivityIndicator size="large" color="#9E9E9E"/>
+          
         </View>
       )
     }    
     return (
+      
       <ScrollView style={styles.container}>
+        <Button
+          color='#AAFF00'
+                  title= 'Agregar Artículo'
+                  onPress={() => {
+                    this.props.navigation.navigate('AddArticuloScreen'
+                    );
+                  }}
+                ></Button>
+        <Text>{'\n'}</Text><Text>{'\n'}</Text>
           {
             this.state.articuloArr.map((item, i) => {
               return (
-                <ListItem
-                  key={i}
-                  chevron
-                  bottomDivider
+                <View>
+                
+                <Button
                   title={item.nombre}
-                  subtitle={item.precio}
                   onPress={() => {
                     this.props.navigation.navigate('ArticuloDetalleScreen', {
-                      articulokey: item.key
+                      key: item.key
                     });
-                  }}/>
+                  }}
+                >
+                <Text style={{fontSize:25, marginBottom: 10, textAlign:'center' }}>
+                {item.nombre}
+                </Text>
+                </Button>
+                <Text>
+                {'\n'}
+                </Text>
+                </View>
               );
             })
           }
@@ -76,7 +93,7 @@ class ArticuloScreen extends Component {
 const styles = StyleSheet.create({
   container: {
    flex: 1,
-   paddingBottom: 22
+   paddingBottom: 10
   },
   preloader: {
     left: 0,

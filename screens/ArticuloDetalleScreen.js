@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Alert, Button, StyleSheet, TextInput, ScrollView, ActivityIndicator, View } from 'react-native';
-import firebase from '../database/firebaseDb';
+import { FieldPath, collection, doc, setDoc, ref, set, getDoc, query, where,deleteDoc,updateDoc } from "firebase/firestore";
+import db from "../database/firebaseDb"
 
 class ArticuloDetalleScreen extends Component {
 
   constructor() {
     super();
+    
     this.state = {
       nombre: '',
       precio: '',
@@ -15,15 +17,17 @@ class ArticuloDetalleScreen extends Component {
   }
  
   componentDidMount() {
-    const dbRef = firebase.firestore().collection('articulo').doc(this.props.route.params.articulokey)
-    dbRef.get().then((res) => {
+    const param = this.props.route.params.key
+    const dbRef = collection(db,'articulo')
+    getDoc(query(doc(dbRef,param)))
+    .then((res) => {
       if (res.exists) {
-        const user = res.data();
+        const articulo = res.data();
         this.setState({
           key: res.id,
-          nombre: user.nombre,
-          precio: user.precio,
-          referencia: user.referencia,
+          nombre: articulo.nombre,
+          precio: articulo.precio,
+          referencia: articulo.referencia,
           isLoading: false
         });
       } else {
@@ -31,6 +35,7 @@ class ArticuloDetalleScreen extends Component {
       }
     });
   }
+
 
   inputValueUpdate = (val, prop) => {
     const state = this.state;
@@ -42,12 +47,15 @@ class ArticuloDetalleScreen extends Component {
     this.setState({
       isLoading: true,
     });
-    const updateDBRef = firebase.firestore().collection('articulo').doc(this.state.key);
-    updateDBRef.set({
+    const param = this.props.route.params.key
+    const updateDBRef = collection(db,'articulo')
+    const docRef = doc( updateDBRef, param)
+    updateDoc(docRef, {
       nombre: this.state.nombre,
       precio: this.state.precio,
       referencia: this.state.referencia,
-    }).then((docRef) => {
+    }).then((res) => {
+      console.log('Articulo actualizado de Base de Datos')
       this.setState({
         key: '',
         nombre: '',
@@ -55,7 +63,7 @@ class ArticuloDetalleScreen extends Component {
         referencia: '',
         isLoading: false,
       });
-      this.props.navigation.navigate('articuloScreen');
+      this.props.navigation.navigate('ArticuloScreen');
     })
     .catch((error) => {
       console.error("Error: ", error);
@@ -66,26 +74,27 @@ class ArticuloDetalleScreen extends Component {
   }
 
   deleteArticulo() {
-    const dbRef = firebase.firestore().collection('articulo').doc(this.props.route.params.articulokey)
-      dbRef.delete().then((res) => {
-          console.log('Articulo eliminado de Base de DAtos')
-          this.props.navigation.navigate('articuloScreen');
-      })
-  }
-
-  openTwoButtonAlert=()=>{
-    Alert.alert(
-      '¿Eliminar artículo?',
-      '¿Está seguro/a?',
-      [
-        {text: 'Si', onPress: () => this.deleteArticulo()},
-        {text: 'No', onPress: () => console.log('No se ha eliminado'), style: 'cancel'},
-      ],
-      { 
-        cancelable: true 
-      }
-    );
-  }
+    // let eliminar=false
+    // Alert.alert(
+    //   '¿Eliminar artículo?',
+    //   [
+    //     {text: 'Si', onPress: () => this.eliminar = true},
+    //     {text: 'No', onPress: () => console.log('No se ha eliminado'), style: 'cancel'},
+    //   ],
+    //   { 
+    //     cancelable: true 
+    //   }
+    // );
+    //if (eliminar == true){ 
+    const param = this.props.route.params.key
+    const dbRef = collection(db,'articulo')
+    deleteDoc(doc(dbRef,param))
+    
+          console.log('Articulo eliminado de Base de Datos')
+          this.props.navigation.navigate('ArticuloScreen');
+      
+    // }
+    }
 
   render() {
     if(this.state.isLoading){
@@ -106,8 +115,6 @@ class ArticuloDetalleScreen extends Component {
         </View>
         <View style={styles.inputGroup}>
           <TextInput
-              multiline={true}
-              numberOfLines={4}
               placeholder={'precio'}
               value={this.state.precio}
               onChangeText={(val) => this.inputValueUpdate(val, 'precio')}
@@ -122,15 +129,15 @@ class ArticuloDetalleScreen extends Component {
         </View>
         <View style={styles.button}>
           <Button
-            title='Update'
+            title='Actualizar'
             onPress={() => this.updateArticulo()} 
             color="#19AC52"
           />
           </View>
          <View>
           <Button
-            title='Delete'
-            onPress={this.openTwoButtonAlert}
+            title='Eliminar'
+            onPress={() => this.deleteArticulo()}
             color="#E37399"
           />
         </View>

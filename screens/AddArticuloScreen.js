@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Button, StyleSheet, TextInput, ScrollView, ActivityIndicator, View } from 'react-native';
-import firebase from '../database/firebaseDb';
+import { collection, doc, Firestore, setDoc} from "firebase/firestore";
+import db from "../database/firebaseDb"
+
 
 class AddArticuloScreen extends Component {
   constructor() {
     super();
-    this.dbRef = firebase.firestore().collection('articulo');
+    this.dbRef = collection(db,'articulo');
     this.state = {
       nombre: '',
       precio: '',
@@ -26,19 +28,17 @@ class AddArticuloScreen extends Component {
     } else {
       this.setState({
         isLoading: true,
-      });      
-      this.dbRef.add({
-        nombre: this.state.nombre,
-        precio: this.state.precio,
-        referencia: this.state.referencia,
-      }).then((res) => {
+      });
+      const data = {nombre: this.state.nombre,precio: this.state.precio,referencia: this.state.referencia}
+      setDoc(doc(this.dbRef), data)  
+      .then((res) => {
         this.setState({
           nombre: '',
           precio: '',
           referencia: '',
           isLoading: false,
         });
-        this.props.navigation.navigate('articuloScreen')
+        this.props.navigation.navigate('ArticuloScreen')
       })
       .catch((err) => {
         console.error("Error found: ", err);
@@ -68,8 +68,6 @@ class AddArticuloScreen extends Component {
         </View>
         <View style={styles.inputGroup}>
           <TextInput
-              multiline={true}
-              numberOfLines={4}
               placeholder={'precio'}
               value={this.state.precio}
               onChangeText={(val) => this.inputValueUpdate(val, 'precio')}
@@ -84,7 +82,7 @@ class AddArticuloScreen extends Component {
         </View>
         <View style={styles.button}>
           <Button
-            title='Add User'
+            title='Agregar Articulo'
             onPress={() => this.storeArticulo()} 
             color="#19AC52"
           />
@@ -105,6 +103,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#cccccc',
+    padding:15,
+    fontSize:25
   },
   preloader: {
     left: 0,
@@ -117,4 +117,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Addarticulocreen;
+export default AddArticuloScreen;

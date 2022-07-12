@@ -1,6 +1,7 @@
-//import * as firebase from 'firebase';
-//import firestore from 'firebase/firestore'
 import { initializeApp } from "firebase/app";
+import { getFirestore } from 'firebase/firestore'
+
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 
@@ -27,9 +28,7 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app)
+export default db
 
-firebase.firestore();
-
-export default firebase;
