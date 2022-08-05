@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Button, StyleSheet, TextInput, ScrollView, ActivityIndicator, View } from 'react-native';
-import { collection, doc, Firestore, setDoc} from "firebase/firestore";
+import { collection, doc, Firestore, setDoc, onSnapshot} from "firebase/firestore";
 import db from "../database/firebaseDb"
 
 
 class AddArticuloScreen extends Component {
+
   constructor() {
     super();
     this.dbRef = collection(db,'articulo');
@@ -14,18 +15,52 @@ class AddArticuloScreen extends Component {
       referencia: '',
       isLoading: false
     };
+    ReferenciasArtsArr:[]
   }
-
   inputValueUpdate = (val, prop) => {
     const state = this.state;
     state[prop] = val;
     this.setState(state);
   }
+  componentDidMount() {
+    this.unsubscribe = onSnapshot(this.dbRef, this.getCollection);
+  }
+
+  componentWillUnmount(){
+    this.unsubscribe();
+  }
+
+  getCollection = (querySnapshot) => {
+    const ReferenciasArtsArr = [];
+    querySnapshot.forEach((res) => {
+      const { referencia } = res.data();
+      ReferenciasArtsArr.push({referencia})
+    });
+    this.setState({
+      ReferenciasArtsArr,
+      isLoading: false,
+   });
+   //console.log(ReferenciasArtsArr)
+  }
+  
 
   storeArticulo() {
+    let guarda =true
+    //console.log(this.state.ReferenciasArtsArr)
+    this.state.ReferenciasArtsArr.forEach(ref => {
+      // console.log(this.state.referencia)
+      // console.log(ref.referencia)
+      if(this.state.referencia == ref.referencia){
+        alert('El artículo ya existe')
+        guarda =false
+      }
+    });
+
     if(this.state.nombre === ''){
      alert('El artículo debe tener un nombre')
-    } else {
+     guarda =false
+    } 
+    if (guarda === true){
       this.setState({
         isLoading: true,
       });
@@ -39,9 +74,8 @@ class AddArticuloScreen extends Component {
           isLoading: false,
         });
         this.props.navigation.navigate('ArticuloScreen')
-      })
-      .catch((err) => {
-        console.error("Error found: ", err);
+      }).catch((err) => {
+        console.err("Error found: ", err);
         this.setState({
           isLoading: false,
         });

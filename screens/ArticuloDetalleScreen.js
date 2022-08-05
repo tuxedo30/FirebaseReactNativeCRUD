@@ -30,6 +30,7 @@ class ArticuloDetalleScreen extends Component {
           referencia: articulo.referencia,
           isLoading: false
         });
+        
       } else {
         console.log("No existe el artículo");
       }

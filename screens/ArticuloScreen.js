@@ -13,7 +13,8 @@ class ArticuloScreen extends Component {
     this.firestoreRef = collection(db,'articulo');
     this.state = {
       isLoading: true,
-      articuloArr: []
+      articuloArr: [],
+      
     };
   }
 
@@ -30,6 +31,7 @@ class ArticuloScreen extends Component {
     querySnapshot.forEach((res) => {
       const { nombre, precio, referencia } = res.data();
       articuloArr.push({key: res.id, nombre, precio, referencia});
+      
     });
     this.setState({
       articuloArr,
@@ -107,3 +109,4 @@ const styles = StyleSheet.create({
 })
 
 export default ArticuloScreen;
+
